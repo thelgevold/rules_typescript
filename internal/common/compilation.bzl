@@ -292,6 +292,10 @@ def compile_ts(ctx,
   if not is_library:
     files += depset(tsickle_externs)
 
+  transitive_es6_srcs = depset()
+  for dep in ctx.attr.deps:
+    transitive_es6_srcs += getattr(dep.typescript, "transitive_es6_srcs", [])
+
   return {
       "files": files,
       "runfiles": ctx.runfiles(
@@ -311,6 +315,7 @@ def compile_ts(ctx,
           "type_blacklisted_declarations": type_blacklisted_declarations,
           "tsickle_externs": tsickle_externs,
           "replay_params": replay_params,
+          "transitive_es6_srcs": transitive_es6_srcs + es6_sources
       },
       # Expose the tags so that a Skylark aspect can access them.
       "tags": ctx.attr.tags,
